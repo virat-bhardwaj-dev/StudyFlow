@@ -1,159 +1,356 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
+    <meta
+        name="description"
+        content="StudyFlow - A modern student productivity dashboard for managing tasks, study sessions and productivity."
+    >
+
     <title>StudyFlow | Student Productivity</title>
 
+    <!-- Google Font -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap"
+        rel="stylesheet"
+    >
 
+    <!-- Styles -->
     <link rel="stylesheet" href="style.css">
 
+    <!-- Chart.js -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
+
 
 <body>
 
 <div class="app">
 
-    <aside class="sidebar">
+    <!-- =========================================
+         SIDEBAR
+    ========================================== -->
 
-        <div class="logo">
-            <div class="logo-icon">✦</div>
-            <span>StudyFlow</span>
+    <aside class="sidebar" id="sidebar">
+
+        <div class="sidebar-top">
+
+            <div class="logo">
+                <div class="logo-icon">✦</div>
+                <span>StudyFlow</span>
+            </div>
+
+
+            <button
+                class="mobile-close"
+                id="mobileClose"
+                aria-label="Close navigation"
+            >
+                ×
+            </button>
+
+
+            <nav class="navigation" aria-label="Main navigation">
+
+                <button
+                    class="nav-item active"
+                    data-page="dashboard"
+                    type="button"
+                >
+                    <span class="nav-icon">▦</span>
+                    <span>Dashboard</span>
+                </button>
+
+
+                <button
+                    class="nav-item"
+                    data-page="tasks"
+                    type="button"
+                >
+                    <span class="nav-icon">✓</span>
+                    <span>Tasks</span>
+                </button>
+
+
+                <button
+                    class="nav-item"
+                    data-page="study"
+                    type="button"
+                >
+                    <span class="nav-icon">◷</span>
+                    <span>Study Tracker</span>
+                </button>
+
+
+                <button
+                    class="nav-item"
+                    data-page="analytics"
+                    type="button"
+                >
+                    <span class="nav-icon">◈</span>
+                    <span>Analytics</span>
+                </button>
+
+            </nav>
+
         </div>
 
-        <nav class="navigation">
 
-            <button class="nav-item active" data-page="dashboard">
-                <span>▦</span>
-                Dashboard
-            </button>
-
-            <button class="nav-item" data-page="tasks">
-                <span>✓</span>
-                Tasks
-            </button>
-
-            <button class="nav-item" data-page="study">
-                <span>◷</span>
-                Study Tracker
-            </button>
-
-            <button class="nav-item" data-page="analytics">
-                <span>◈</span>
-                Analytics
-            </button>
-
-        </nav>
+        <!-- Sidebar Bottom -->
 
         <div class="sidebar-bottom">
 
-            <button class="nav-item" data-page="settings">
-                <span>⚙</span>
-                Settings
+            <button
+                class="nav-item"
+                data-page="settings"
+                type="button"
+            >
+                <span class="nav-icon">⚙</span>
+                <span>Settings</span>
             </button>
+
+
+            <div class="sidebar-footer">
+                <span class="footer-dot"></span>
+                <span>StudyFlow v2.0</span>
+            </div>
 
         </div>
 
     </aside>
 
 
+    <!-- Mobile Overlay -->
+
+    <div
+        class="sidebar-overlay"
+        id="sidebarOverlay"
+    ></div>
+
+
+    <!-- =========================================
+         MAIN CONTENT
+    ========================================== -->
+
     <main class="main">
+
+        <!-- TOPBAR -->
 
         <header class="topbar">
 
-            <div>
-                <p class="date" id="currentDate"></p>
-                <h1 id="pageTitle">Good evening 👋</h1>
-                <p class="subtitle" id="pageSubtitle">
-                    Here's what's happening with your productivity today.
-                </p>
+            <div class="topbar-left">
+
+                <button
+                    class="mobile-menu-btn"
+                    type="button"
+                    aria-label="Open menu"
+                >
+                    ☰
+                </button>
+
+
+                <div class="topbar-heading">
+
+                    <p
+                        class="date"
+                        id="currentDate"
+                    ></p>
+
+
+                    <h1 id="pageTitle">
+                        Good evening 👋
+                    </h1>
+
+
+                    <p
+                        class="subtitle"
+                        id="pageSubtitle"
+                    >
+                        Here's what's happening with your productivity today.
+                    </p>
+
+                </div>
+
             </div>
 
-            <div class="profile-avatar" id="avatar">S</div>
+
+            <button
+                class="profile-avatar"
+                id="avatar"
+                type="button"
+                aria-label="Open settings"
+            >
+                S
+            </button>
 
         </header>
 
 
-        <section class="page active-page" id="dashboard">
+        <!-- =========================================
+             DASHBOARD
+        ========================================== -->
+
+        <section
+            class="page active-page"
+            id="dashboard"
+        >
+
+            <!-- Stats -->
 
             <div class="stats-grid">
 
                 <div class="stat-card">
+
                     <div class="stat-top">
                         <div class="stat-icon">⚡</div>
                     </div>
 
                     <p>Productivity Score</p>
-                    <h2 id="productivityScore">0%</h2>
-                    <span id="productivityText">Complete your first task</span>
+
+                    <h2 id="productivityScore">
+                        0%
+                    </h2>
+
+                    <span id="productivityText">
+                        Complete your first task
+                    </span>
+
                 </div>
 
 
                 <div class="stat-card">
-                    <div class="stat-icon">🎯</div>
+
+                    <div class="stat-icon">
+                        🎯
+                    </div>
 
                     <p>Daily Goal</p>
-                    <h2 id="dailyGoal">0%</h2>
-                    <span id="dailyGoalText">0 / 0 tasks</span>
+
+                    <h2 id="dailyGoal">
+                        0%
+                    </h2>
+
+                    <span id="dailyGoalText">
+                        0 / 0 tasks
+                    </span>
+
                 </div>
 
 
                 <div class="stat-card">
-                    <div class="stat-icon">⏱️</div>
+
+                    <div class="stat-icon">
+                        ⏱️
+                    </div>
 
                     <p>Study Time</p>
-                    <h2 id="studyTime">0m</h2>
-                    <span>Today's focus time</span>
+
+                    <h2 id="studyTime">
+                        0m
+                    </h2>
+
+                    <span>
+                        Today's focus time
+                    </span>
+
                 </div>
 
 
                 <div class="stat-card">
-                    <div class="stat-icon">🔥</div>
+
+                    <div class="stat-icon">
+                        🔥
+                    </div>
 
                     <p>Current Streak</p>
-                    <h2 id="streak">0 days</h2>
-                    <span id="streakText">Start your journey</span>
+
+                    <h2 id="streak">
+                        0 days
+                    </h2>
+
+                    <span id="streakText">
+                        Start your journey
+                    </span>
+
                 </div>
 
             </div>
 
 
+            <!-- Dashboard Grid -->
+
             <div class="dashboard-grid">
+
+                <!-- Today's Tasks -->
 
                 <div class="card">
 
                     <div class="card-header">
 
                         <div>
-                            <p class="eyebrow">TODAY</p>
-                            <h2>Tasks</h2>
+                            <p class="eyebrow">
+                                TODAY
+                            </p>
+
+                            <h2>
+                                Tasks
+                            </h2>
                         </div>
 
-                        <button class="primary-btn" id="addTaskBtn">
+
+                        <button
+                            class="primary-btn"
+                            id="addTaskBtn"
+                            type="button"
+                        >
                             + Add Task
                         </button>
 
                     </div>
 
-                    <div id="dashboardTasks" class="task-list"></div>
+
+                    <div
+                        id="dashboardTasks"
+                        class="task-list"
+                    ></div>
 
                 </div>
 
 
+                <!-- Weekly Progress -->
+
                 <div class="card">
 
                     <div class="card-header">
+
                         <div>
-                            <p class="eyebrow">THIS WEEK</p>
-                            <h2>Study Progress</h2>
+                            <p class="eyebrow">
+                                THIS WEEK
+                            </p>
+
+                            <h2>
+                                Study Progress
+                            </h2>
                         </div>
+
+
+                        <button
+                            class="icon-btn"
+                            id="refreshChart"
+                            type="button"
+                            aria-label="Refresh chart"
+                        >
+                            ↻
+                        </button>
+
                     </div>
+
 
                     <div class="chart-wrapper">
                         <canvas id="weeklyChart"></canvas>
@@ -164,22 +361,59 @@
             </div>
 
 
+            <!-- Bottom Grid -->
+
             <div class="bottom-grid">
+
+                <!-- Study Goal -->
 
                 <div class="card">
 
-                    <p class="eyebrow">DAILY TARGET</p>
-                    <h2>Study Goal</h2>
+                    <div class="goal-heading">
+
+                        <div>
+                            <p class="eyebrow">
+                                DAILY TARGET
+                            </p>
+
+                            <h2>
+                                Study Goal
+                            </h2>
+                        </div>
+
+
+                        <span
+                            class="goal-badge"
+                            id="goalBadge"
+                        >
+                            0%
+                        </span>
+
+                    </div>
+
 
                     <div class="progress-container">
 
                         <div class="progress-bar">
-                            <div class="progress-fill" id="studyProgress"></div>
+
+                            <div
+                                class="progress-fill"
+                                id="studyProgress"
+                            ></div>
+
                         </div>
 
+
                         <div class="progress-info">
-                            <span id="studyProgressText">0m studied</span>
-                            <strong id="studyGoalText">4h goal</strong>
+
+                            <span id="studyProgressText">
+                                0m studied
+                            </span>
+
+                            <strong id="studyGoalText">
+                                4h goal
+                            </strong>
+
                         </div>
 
                     </div>
@@ -187,16 +421,24 @@
                 </div>
 
 
+                <!-- Quote -->
+
                 <div class="card quote-card">
 
-                    <span class="quote-mark">"</span>
+                    <span class="quote-mark">
+                        "
+                    </span>
+
 
                     <p id="dailyQuote">
                         Success is the sum of small efforts,
                         repeated day in and day out.
                     </p>
 
-                    <span>— Robert Collier</span>
+
+                    <span>
+                        — Robert Collier
+                    </span>
 
                 </div>
 
@@ -205,64 +447,196 @@
         </section>
 
 
-        <section class="page" id="tasks">
+        <!-- =========================================
+             TASKS
+        ========================================== -->
+
+        <section
+            class="page"
+            id="tasks"
+        >
 
             <div class="section-header">
 
                 <div>
-                    <p class="eyebrow">PRODUCTIVITY</p>
-                    <h2>My Tasks</h2>
-                    <p>Manage everything you need to get done.</p>
+
+                    <p class="eyebrow">
+                        PRODUCTIVITY
+                    </p>
+
+                    <h2>
+                        My Tasks
+                    </h2>
+
+                    <p>
+                        Manage everything you need to get done.
+                    </p>
+
                 </div>
 
-                <button class="primary-btn" id="addTaskBtn2">
+
+                <button
+                    class="primary-btn"
+                    id="addTaskBtn2"
+                    type="button"
+                >
                     + Add Task
                 </button>
 
             </div>
 
-            <div class="filter-row">
 
-                <button class="filter active" data-filter="all">All</button>
-                <button class="filter" data-filter="active">Active</button>
-                <button class="filter" data-filter="completed">Completed</button>
+            <!-- Task Toolbar -->
+
+            <div class="task-toolbar">
+
+                <div class="filter-row">
+
+                    <button
+                        class="filter active"
+                        data-filter="all"
+                        type="button"
+                    >
+                        All
+                    </button>
+
+                    <button
+                        class="filter"
+                        data-filter="active"
+                        type="button"
+                    >
+                        Active
+                    </button>
+
+                    <button
+                        class="filter"
+                        data-filter="completed"
+                        type="button"
+                    >
+                        Completed
+                    </button>
+
+                </div>
+
+
+                <div class="task-search">
+
+                    <span>
+                        ⌕
+                    </span>
+
+                    <input
+                        type="search"
+                        id="taskSearch"
+                        placeholder="Search tasks..."
+                        aria-label="Search tasks"
+                    >
+
+                </div>
 
             </div>
 
+
+            <!-- Task Stats -->
+
+            <div class="task-mini-stats">
+
+                <div>
+                    <span>Total</span>
+                    <strong id="totalTasks">
+                        0
+                    </strong>
+                </div>
+
+                <div>
+                    <span>Active</span>
+                    <strong id="activeTasks">
+                        0
+                    </strong>
+                </div>
+
+                <div>
+                    <span>Completed</span>
+                    <strong id="completedTasks">
+                        0
+                    </strong>
+                </div>
+
+            </div>
+
+
             <div class="card">
-                <div id="allTasks" class="task-list"></div>
+
+                <div
+                    id="allTasks"
+                    class="task-list"
+                ></div>
+
             </div>
 
         </section>
 
 
-        <section class="page" id="study">
+        <!-- =========================================
+             STUDY TRACKER
+        ========================================== -->
+
+        <section
+            class="page"
+            id="study"
+        >
 
             <div class="card timer-card">
 
+                <!-- Timer Header -->
+
                 <div class="timer-header">
+
                     <div>
-                        <p class="eyebrow">FOCUS SESSION</p>
-                        <h2>Study Timer</h2>
+
+                        <p class="eyebrow">
+                            FOCUS SESSION
+                        </p>
+
+                        <h2>
+                            Study Timer
+                        </h2>
+
                         <p class="timer-subtitle">
                             Choose your focus duration and start studying.
                         </p>
+
                     </div>
 
+
                     <div class="timer-status">
+
                         <span class="status-dot"></span>
-                        Focus Mode
+
+                        <span id="timerStatus">
+                            Focus Mode
+                        </span>
+
                     </div>
+
                 </div>
 
 
+                <!-- Timer -->
+
                 <div class="timer-display">
 
-                    <div class="timer-ring">
+                    <div
+                        class="timer-ring"
+                        id="timerRing"
+                    >
 
                         <div class="timer-ring-inner">
 
-                            <div class="timer" id="timer">
+                            <div
+                                class="timer"
+                                id="timer"
+                            >
                                 00:30:00
                             </div>
 
@@ -277,13 +651,20 @@
                 </div>
 
 
+                <!-- Duration -->
+
                 <div class="duration-section">
 
                     <div class="duration-title">
-                        <span>Session duration</span>
+
+                        <span>
+                            Session duration
+                        </span>
+
                         <span class="duration-hint">
                             Choose one
                         </span>
+
                     </div>
 
 
@@ -292,36 +673,60 @@
                         <button
                             class="timer-option active"
                             data-minutes="30"
+                            type="button"
                         >
-                            <strong>30</strong>
-                            <span>MIN</span>
+                            <strong>
+                                30
+                            </strong>
+
+                            <span>
+                                MIN
+                            </span>
                         </button>
 
 
                         <button
                             class="timer-option"
                             data-minutes="60"
+                            type="button"
                         >
-                            <strong>1</strong>
-                            <span>HOUR</span>
+                            <strong>
+                                1
+                            </strong>
+
+                            <span>
+                                HOUR
+                            </span>
                         </button>
 
 
                         <button
                             class="timer-option"
                             data-minutes="120"
+                            type="button"
                         >
-                            <strong>2</strong>
-                            <span>HOURS</span>
+                            <strong>
+                                2
+                            </strong>
+
+                            <span>
+                                HOURS
+                            </span>
                         </button>
 
 
                         <button
                             class="timer-option"
                             data-minutes="240"
+                            type="button"
                         >
-                            <strong>4</strong>
-                            <span>HOURS</span>
+                            <strong>
+                                4
+                            </strong>
+
+                            <span>
+                                HOURS
+                            </span>
                         </button>
 
                     </div>
@@ -329,11 +734,14 @@
                 </div>
 
 
+                <!-- Subject -->
+
                 <div class="timer-subject">
 
                     <label for="subjectSelect">
                         What are you studying?
                     </label>
+
 
                     <select id="subjectSelect">
 
@@ -366,11 +774,14 @@
                 </div>
 
 
+                <!-- Timer Controls -->
+
                 <div class="timer-buttons">
 
                     <button
                         class="primary-btn timer-start"
                         id="startTimer"
+                        type="button"
                     >
                         ▶ Start Session
                     </button>
@@ -379,6 +790,7 @@
                     <button
                         class="secondary-btn timer-reset"
                         id="resetTimer"
+                        type="button"
                     >
                         ↻ Reset
                     </button>
@@ -387,73 +799,236 @@
 
 
                 <div class="timer-tip">
-                    💡 Tip: Put your phone away and focus until the timer ends.
+                    💡 Put your phone away and focus until the timer ends.
                 </div>
+
+            </div>
+
+
+            <!-- Recent Sessions -->
+
+            <div class="card recent-sessions-card">
+
+                <div class="card-header">
+
+                    <div>
+
+                        <p class="eyebrow">
+                            HISTORY
+                        </p>
+
+                        <h2>
+                            Recent Sessions
+                        </h2>
+
+                    </div>
+
+
+                    <span
+                        class="session-count"
+                        id="sessionCount"
+                    >
+                        0 sessions
+                    </span>
+
+                </div>
+
+
+                <div
+                    class="sessions-list"
+                    id="sessionsList"
+                ></div>
 
             </div>
 
         </section>
 
 
-        <section class="page" id="analytics">
+        <!-- =========================================
+             ANALYTICS
+        ========================================== -->
+
+        <section
+            class="page"
+            id="analytics"
+        >
 
             <div class="section-header">
 
                 <div>
-                    <p class="eyebrow">INSIGHTS</p>
-                    <h2>Analytics</h2>
-                    <p>Understand your productivity and study habits.</p>
+
+                    <p class="eyebrow">
+                        INSIGHTS
+                    </p>
+
+                    <h2>
+                        Analytics
+                    </h2>
+
+                    <p>
+                        Understand your productivity and study habits.
+                    </p>
+
                 </div>
 
             </div>
 
+
             <div class="analytics-grid">
 
+                <!-- Weekly Chart -->
+
                 <div class="card">
-                    <p class="eyebrow">WEEKLY STUDY</p>
-                    <h2>Study Hours</h2>
+
+                    <div class="card-header">
+
+                        <div>
+
+                            <p class="eyebrow">
+                                WEEKLY STUDY
+                            </p>
+
+                            <h2>
+                                Study Hours
+                            </h2>
+
+                        </div>
+
+                    </div>
+
 
                     <div class="large-chart">
                         <canvas id="analyticsChart"></canvas>
                     </div>
+
                 </div>
 
 
+                <!-- Overview -->
+
                 <div class="card">
 
-                    <p class="eyebrow">OVERVIEW</p>
-                    <h2>Your Progress</h2>
+                    <p class="eyebrow">
+                        OVERVIEW
+                    </p>
+
+                    <h2>
+                        Your Progress
+                    </h2>
+
 
                     <div class="analytics-stat">
-                        <span>Tasks Completed</span>
-                        <strong id="analyticsTasks">0</strong>
+
+                        <span>
+                            Tasks Completed
+                        </span>
+
+                        <strong id="analyticsTasks">
+                            0
+                        </strong>
+
                     </div>
 
-                    <div class="analytics-stat">
-                        <span>Total Study Time</span>
-                        <strong id="analyticsStudy">0m</strong>
-                    </div>
 
                     <div class="analytics-stat">
-                        <span>Current Streak</span>
-                        <strong id="analyticsStreak">0 days</strong>
+
+                        <span>
+                            Total Study Time
+                        </span>
+
+                        <strong id="analyticsStudy">
+                            0m
+                        </strong>
+
+                    </div>
+
+
+                    <div class="analytics-stat">
+
+                        <span>
+                            Current Streak
+                        </span>
+
+                        <strong id="analyticsStreak">
+                            0 days
+                        </strong>
+
+                    </div>
+
+
+                    <div class="analytics-stat">
+
+                        <span>
+                            Productivity Score
+                        </span>
+
+                        <strong id="analyticsProductivity">
+                            0%
+                        </strong>
+
                     </div>
 
                 </div>
 
             </div>
 
+
+            <!-- Subject Breakdown -->
+
+            <div class="card subject-breakdown">
+
+                <div class="card-header">
+
+                    <div>
+
+                        <p class="eyebrow">
+                            SUBJECTS
+                        </p>
+
+                        <h2>
+                            Study Breakdown
+                        </h2>
+
+                    </div>
+
+                </div>
+
+
+                <div
+                    class="subject-list"
+                    id="subjectList"
+                ></div>
+
+            </div>
+
         </section>
 
 
-        <section class="page" id="settings">
+        <!-- =========================================
+             SETTINGS
+        ========================================== -->
+
+        <section
+            class="page"
+            id="settings"
+        >
 
             <div class="section-header">
 
                 <div>
-                    <p class="eyebrow">PREFERENCES</p>
-                    <h2>Settings</h2>
-                    <p>Customize your StudyFlow experience.</p>
+
+                    <p class="eyebrow">
+                        PREFERENCES
+                    </p>
+
+                    <h2>
+                        Settings
+                    </h2>
+
+                    <p>
+                        Customize your StudyFlow experience.
+                    </p>
+
                 </div>
 
             </div>
@@ -461,64 +1036,163 @@
 
             <div class="card settings-card">
 
+                <!-- Name -->
+
                 <div class="setting">
 
                     <div>
-                        <strong>Your Name</strong>
-                        <p>This name will appear on your dashboard.</p>
+
+                        <strong>
+                            Your Name
+                        </strong>
+
+                        <p>
+                            This name will appear on your dashboard.
+                        </p>
+
                     </div>
+
 
                     <input
                         type="text"
                         id="nameInput"
                         placeholder="Enter your name"
+                        autocomplete="name"
                     >
 
                 </div>
 
 
+                <!-- Goal -->
+
                 <div class="setting">
 
                     <div>
-                        <strong>Daily Study Goal</strong>
-                        <p>Set your target study time.</p>
+
+                        <strong>
+                            Daily Study Goal
+                        </strong>
+
+                        <p>
+                            Set your target study time.
+                        </p>
+
                     </div>
 
+
                     <select id="goalInput">
-                        <option value="1">1 hour</option>
-                        <option value="2">2 hours</option>
-                        <option value="3">3 hours</option>
-                        <option value="4">4 hours</option>
-                        <option value="5">5 hours</option>
-                        <option value="6">6 hours</option>
-                        <option value="8">8 hours</option>
+
+                        <option value="1">
+                            1 hour
+                        </option>
+
+                        <option value="2">
+                            2 hours
+                        </option>
+
+                        <option value="3">
+                            3 hours
+                        </option>
+
+                        <option value="4" selected>
+                            4 hours
+                        </option>
+
+                        <option value="5">
+                            5 hours
+                        </option>
+
+                        <option value="6">
+                            6 hours
+                        </option>
+
+                        <option value="8">
+                            8 hours
+                        </option>
+
                     </select>
 
                 </div>
 
 
+                <!-- Theme -->
+
                 <div class="setting">
 
                     <div>
-                        <strong>Theme</strong>
-                        <p>Switch between light and dark mode.</p>
+
+                        <strong>
+                            Theme
+                        </strong>
+
+                        <p>
+                            Switch between light and dark mode.
+                        </p>
+
                     </div>
 
-                    <button class="secondary-btn" id="themeBtn">
+
+                    <button
+                        class="secondary-btn"
+                        id="themeBtn"
+                        type="button"
+                    >
                         🌙 Dark Mode
                     </button>
 
                 </div>
 
 
+                <!-- Notifications -->
+
+                <div class="setting">
+
+                    <div>
+
+                        <strong>
+                            Timer Notifications
+                        </strong>
+
+                        <p>
+                            Get notified when a study session ends.
+                        </p>
+
+                    </div>
+
+
+                    <button
+                        class="secondary-btn"
+                        id="notificationBtn"
+                        type="button"
+                    >
+                        Enable
+                    </button>
+
+                </div>
+
+
+                <!-- Reset -->
+
                 <div class="setting danger-setting">
 
                     <div>
-                        <strong>Reset Application</strong>
-                        <p>Delete all tasks and study history.</p>
+
+                        <strong>
+                            Reset Application
+                        </strong>
+
+                        <p>
+                            Delete all tasks and study history.
+                        </p>
+
                     </div>
 
-                    <button class="danger-btn" id="resetData">
+
+                    <button
+                        class="danger-btn"
+                        id="resetData"
+                        type="button"
+                    >
                         Reset Data
                     </button>
 
@@ -533,38 +1207,115 @@
 </div>
 
 
-<div class="modal-overlay" id="taskModal">
+<!-- =========================================
+     TASK MODAL
+========================================= -->
 
-    <div class="modal">
+<div
+    class="modal-overlay"
+    id="taskModal"
+    aria-hidden="true"
+>
+
+    <div
+        class="modal"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="modalTitle"
+    >
 
         <div class="modal-header">
-            <h2>Add New Task</h2>
 
-            <button id="closeModal">×</button>
+            <div>
+
+                <p class="eyebrow">
+                    TASK MANAGER
+                </p>
+
+                <h2 id="modalTitle">
+                    Add New Task
+                </h2>
+
+            </div>
+
+
+            <button
+                id="closeModal"
+                type="button"
+                aria-label="Close modal"
+            >
+                ×
+            </button>
+
         </div>
+
 
         <form id="taskForm">
 
-            <label>Task Name</label>
+            <input
+                type="hidden"
+                id="editingTaskId"
+            >
+
+
+            <label for="taskInput">
+                Task Name
+            </label>
 
             <input
                 type="text"
                 id="taskInput"
                 placeholder="e.g. Complete DSA practice"
                 required
+                maxlength="100"
+                autocomplete="off"
             >
 
-            <label>Priority</label>
+
+            <label for="priorityInput">
+                Priority
+            </label>
 
             <select id="priorityInput">
-                <option value="High">High</option>
-                <option value="Medium" selected>Medium</option>
-                <option value="Low">Low</option>
+
+                <option value="High">
+                    High
+                </option>
+
+                <option
+                    value="Medium"
+                    selected
+                >
+                    Medium
+                </option>
+
+                <option value="Low">
+                    Low
+                </option>
+
             </select>
 
-            <button class="primary-btn modal-submit">
-                Add Task
-            </button>
+
+            <div class="modal-actions">
+
+                <button
+                    type="button"
+                    class="secondary-btn"
+                    id="cancelTask"
+                >
+                    Cancel
+                </button>
+
+
+                <button
+                    type="submit"
+                    class="primary-btn modal-submit"
+                    id="taskSubmit"
+                >
+                    Add Task
+                </button>
+
+            </div>
 
         </form>
 
@@ -573,7 +1324,24 @@
 </div>
 
 
+<!-- =========================================
+     TOAST CONTAINER
+========================================= -->
+
+<div
+    class="toast-container"
+    id="toastContainer"
+    aria-live="polite"
+    aria-atomic="true"
+></div>
+
+
+<!-- =========================================
+     SCRIPT
+========================================= -->
+
 <script src="script.js"></script>
 
 </body>
+
 </html>

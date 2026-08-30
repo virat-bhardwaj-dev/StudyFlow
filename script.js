@@ -9,19 +9,24 @@
 // ========================================
 
 const savedTasks =
-    JSON.parse(localStorage.getItem("studyflowTasks"));
+    JSON.parse(localStorage.getItem("studyflowTasks")) || [];
 
-let tasks = savedTasks || [];
+let tasks = Array.isArray(savedTasks) ? savedTasks : [];
 
-let sessions =
+const savedSessions =
     JSON.parse(localStorage.getItem("studyflowSessions")) || [];
 
-let settings =
-    JSON.parse(localStorage.getItem("studyflowSettings")) || {
-        name: "Student",
-        goal: 4,
-        dark: false
-    };
+let sessions =
+    Array.isArray(savedSessions) ? savedSessions : [];
+
+const savedSettings =
+    JSON.parse(localStorage.getItem("studyflowSettings"));
+
+let settings = savedSettings || {
+    name: "Student",
+    goal: 4,
+    dark: false
+};
 
 
 // ========================================
@@ -77,10 +82,112 @@ const priorityInput =
 
 
 // ========================================
-// TOAST NOTIFICATION
+// MOBILE MENU
 // ========================================
 
-function showToast(message, type = "success") {
+const mobileMenuBtn =
+    document.querySelector(".mobile-menu-btn");
+
+const sidebar =
+    document.querySelector(".sidebar");
+
+
+// Create overlay
+const mobileOverlay =
+    document.createElement("div");
+
+mobileOverlay.className =
+    "mobile-overlay";
+
+document.body.appendChild(
+    mobileOverlay
+);
+
+
+// Open menu
+function openMobileMenu() {
+
+    sidebar?.classList.add(
+        "mobile-open"
+    );
+
+    mobileOverlay.classList.add(
+        "show"
+    );
+
+    document.body.style.overflow =
+        "hidden";
+}
+
+
+// Close menu
+function closeMobileMenu() {
+
+    sidebar?.classList.remove(
+        "mobile-open"
+    );
+
+    mobileOverlay.classList.remove(
+        "show"
+    );
+
+    document.body.style.overflow =
+        "";
+}
+
+
+// Hamburger click
+mobileMenuBtn?.addEventListener(
+    "click",
+    () => {
+
+        if (
+            sidebar?.classList.contains(
+                "mobile-open"
+            )
+        ) {
+
+            closeMobileMenu();
+
+        } else {
+
+            openMobileMenu();
+
+        }
+
+    }
+);
+
+
+// Overlay click
+mobileOverlay.addEventListener(
+    "click",
+    closeMobileMenu
+);
+
+
+// Close after selecting page
+navItems.forEach(item => {
+
+    item.addEventListener(
+        "click",
+        () => {
+
+            if (
+                window.innerWidth <= 750
+            ) {
+                closeMobileMenu();
+            }
+
+        }
+    );
+
+});
+// ========================================
+// TOAST
+// ========================================
+
+function showToast(message) {
 
     let toast =
         document.getElementById("toast");
@@ -121,20 +228,30 @@ function showToast(message, type = "success") {
                 opacity: 1;
                 transform: translateY(0);
             }
+
+            @media(max-width:600px) {
+                #toast {
+                    left: 15px;
+                    right: 15px;
+                    bottom: 15px;
+                    text-align: center;
+                }
+            }
         `;
 
         document.head.appendChild(style);
     }
 
     toast.textContent = message;
-
-    toast.className = "show";
+    toast.classList.add("show");
 
     clearTimeout(window.toastTimer);
 
     window.toastTimer =
         setTimeout(() => {
-            toast.className = "";
+
+            toast.classList.remove("show");
+
         }, 2500);
 }
 
@@ -145,20 +262,21 @@ function showToast(message, type = "success") {
 
 function updateDate() {
 
-    const now = new Date();
-
     const dateElement =
         document.getElementById("currentDate");
 
     if (!dateElement) return;
 
     dateElement.textContent =
-        now.toLocaleDateString("en-US", {
-            weekday: "long",
-            month: "long",
-            day: "numeric",
-            year: "numeric"
-        });
+        new Date().toLocaleDateString(
+            "en-US",
+            {
+                weekday: "long",
+                month: "long",
+                day: "numeric",
+                year: "numeric"
+            }
+        );
 }
 
 
@@ -171,8 +289,7 @@ function updateGreeting() {
     const hour =
         new Date().getHours();
 
-    let greeting =
-        "Good morning";
+    let greeting = "Good morning";
 
     if (hour >= 12 && hour < 18) {
         greeting = "Good afternoon";
@@ -242,8 +359,9 @@ navItems.forEach(item => {
             behavior: "smooth"
         });
 
+        // Update charts whenever analytics page opens
+        setTimeout(updateChart, 50);
     });
-
 });
 
 
@@ -253,108 +371,126 @@ navItems.forEach(item => {
 
 function openTaskModal() {
 
+    if (!taskModal) return;
+
     taskModal.classList.add("show");
 
-    taskInput.value = "";
+    if (taskInput) {
+        taskInput.value = "";
+        taskInput.focus();
+    }
 
-    priorityInput.value = "Medium";
-
-    taskInput.focus();
+    if (priorityInput) {
+        priorityInput.value = "Medium";
+    }
 }
 
 
 function closeTaskModal() {
 
+    if (!taskModal) return;
+
     taskModal.classList.remove("show");
 
-    taskForm.reset();
+    if (taskForm) {
+        taskForm.reset();
+    }
 }
 
 
-document
-    .getElementById("addTaskBtn")
-    .addEventListener(
-        "click",
-        openTaskModal
-    );
+const addTaskBtn =
+    document.getElementById("addTaskBtn");
+
+const addTaskBtn2 =
+    document.getElementById("addTaskBtn2");
+
+const closeModal =
+    document.getElementById("closeModal");
 
 
-document
-    .getElementById("addTaskBtn2")
-    .addEventListener(
-        "click",
-        openTaskModal
-    );
+addTaskBtn?.addEventListener(
+    "click",
+    openTaskModal
+);
 
+addTaskBtn2?.addEventListener(
+    "click",
+    openTaskModal
+);
 
-document
-    .getElementById("closeModal")
-    .addEventListener(
-        "click",
-        closeTaskModal
-    );
+closeModal?.addEventListener(
+    "click",
+    closeTaskModal
+);
 
+taskModal?.addEventListener(
+    "click",
+    event => {
 
-taskModal.addEventListener("click", event => {
-
-    if (event.target === taskModal) {
-
-        closeTaskModal();
+        if (event.target === taskModal) {
+            closeTaskModal();
+        }
     }
+);
 
-});
 
+document.addEventListener(
+    "keydown",
+    event => {
 
-document.addEventListener("keydown", event => {
-
-    if (event.key === "Escape") {
-
-        closeTaskModal();
+        if (event.key === "Escape") {
+            closeTaskModal();
+        }
     }
-
-});
+);
 
 
 // ========================================
 // ADD TASK
 // ========================================
 
-taskForm.addEventListener("submit", event => {
+taskForm?.addEventListener(
+    "submit",
+    event => {
 
-    event.preventDefault();
+        event.preventDefault();
 
-    const title =
-        taskInput.value.trim();
+        const title =
+            taskInput?.value.trim();
 
-    if (!title) return;
+        if (!title) {
 
-    const newTask = {
+            showToast("Please enter a task");
 
-        id: Date.now(),
+            return;
+        }
 
-        title,
+        const newTask = {
 
-        priority:
-            priorityInput.value,
+            id: Date.now(),
 
-        completed: false,
+            title,
 
-        createdAt:
-            new Date().toISOString()
+            priority:
+                priorityInput?.value || "Medium",
 
-    };
+            completed: false,
 
-    tasks.push(newTask);
+            createdAt:
+                new Date().toISOString()
+        };
 
-    saveData();
+        tasks.push(newTask);
 
-    renderTasks();
+        saveData();
 
-    closeTaskModal();
+        renderTasks();
 
-    showToast("✓ Task added successfully");
+        closeTaskModal();
 
-});
+        showToast("✓ Task added successfully");
+    }
+);
 
 
 // ========================================
@@ -384,7 +520,8 @@ function createTaskHTML(task) {
                 </div>
 
                 <span class="priority ${
-                    task.priority.toLowerCase()
+                    String(task.priority)
+                        .toLowerCase()
                 }">
                     ${escapeHTML(task.priority)}
                 </span>
@@ -395,6 +532,7 @@ function createTaskHTML(task) {
                 class="delete-btn edit-btn"
                 data-edit="${task.id}"
                 title="Edit task"
+                aria-label="Edit task"
             >
                 ✏️
             </button>
@@ -403,9 +541,44 @@ function createTaskHTML(task) {
                 class="delete-btn"
                 data-delete="${task.id}"
                 title="Delete task"
+                aria-label="Delete task"
             >
                 🗑️
             </button>
+
+        </div>
+    `;
+}
+
+
+// ========================================
+// EMPTY TASK STATE
+// ========================================
+
+function emptyTasks() {
+
+    return `
+        <div style="
+            text-align:center;
+            padding:40px 10px;
+            color:var(--muted);
+            font-size:13px;
+        ">
+
+            <div style="
+                font-size:30px;
+                margin-bottom:10px;
+            ">
+                🚀
+            </div>
+
+            <strong>No tasks yet</strong>
+
+            <div style="
+                margin-top:5px;
+            ">
+                Add a task and start being productive.
+            </div>
 
         </div>
     `;
@@ -425,9 +598,7 @@ function renderTasks(
 
     currentFilter = filter;
 
-    let filteredTasks =
-        tasks;
-
+    let filteredTasks = [...tasks];
 
     if (filter === "active") {
 
@@ -437,7 +608,6 @@ function renderTasks(
             );
     }
 
-
     if (filter === "completed") {
 
         filteredTasks =
@@ -446,70 +616,29 @@ function renderTasks(
             );
     }
 
-
-    if (filteredTasks.length === 0) {
-
-        allTasks.innerHTML =
-            emptyTasks();
-
-    } else {
+    if (allTasks) {
 
         allTasks.innerHTML =
-            filteredTasks
-                .map(createTaskHTML)
-                .join("");
+            filteredTasks.length === 0
+                ? emptyTasks()
+                : filteredTasks
+                    .map(createTaskHTML)
+                    .join("");
     }
 
-
-    if (tasks.length === 0) {
-
-        dashboardTasks.innerHTML =
-            emptyTasks();
-
-    } else {
+    if (dashboardTasks) {
 
         dashboardTasks.innerHTML =
-            tasks
-                .slice(-5)
-                .reverse()
-                .map(createTaskHTML)
-                .join("");
+            tasks.length === 0
+                ? emptyTasks()
+                : tasks
+                    .slice(-5)
+                    .reverse()
+                    .map(createTaskHTML)
+                    .join("");
     }
-
 
     updateDashboard();
-}
-
-
-// ========================================
-// EMPTY STATE
-// ========================================
-
-function emptyTasks() {
-
-    return `
-        <div style="
-            text-align:center;
-            padding:40px 10px;
-            color:var(--muted);
-            font-size:13px;
-        ">
-            <div style="
-                font-size:30px;
-                margin-bottom:10px;
-            ">
-                🚀
-            </div>
-
-            <strong>No tasks yet</strong>
-
-            <div style="
-                margin-top:5px;
-            ">
-                Add a task and start being productive.
-            </div>
-        </div>
-    `;
 }
 
 
@@ -517,165 +646,127 @@ function emptyTasks() {
 // TASK ACTIONS
 // ========================================
 
-document.addEventListener("change", event => {
+document.addEventListener(
+    "change",
+    event => {
 
-    if (
-        !event.target.classList
-            .contains("task-checkbox")
-    ) {
-        return;
-    }
-
-
-    const id =
-        Number(event.target.dataset.id);
-
-
-    const task =
-        tasks.find(
-            task => task.id === id
-        );
-
-
-    if (!task) return;
-
-
-    task.completed =
-        event.target.checked;
-
-
-    saveData();
-
-    renderTasks();
-
-    if (task.completed) {
-
-        showToast(
-            "🎉 Task completed!"
-        );
-
-    } else {
-
-        showToast(
-            "Task moved back to active"
-        );
-    }
-
-});
-
-
-// ========================================
-// EDIT + DELETE
-// ========================================
-
-document.addEventListener("click", event => {
-
-    // EDIT
-
-    const editButton =
-        event.target.closest(
-            "[data-edit]"
-        );
-
-
-    if (editButton) {
+        if (
+            !event.target.classList.contains(
+                "task-checkbox"
+            )
+        ) {
+            return;
+        }
 
         const id =
-            Number(
-                editButton.dataset.edit
-            );
-
+            Number(event.target.dataset.id);
 
         const task =
             tasks.find(
                 task => task.id === id
             );
 
-
         if (!task) return;
 
-
-        const newTitle =
-            prompt(
-                "Edit task:",
-                task.title
-            );
-
-
-        if (
-            newTitle === null ||
-            !newTitle.trim()
-        ) {
-            return;
-        }
-
-
-        task.title =
-            newTitle.trim();
-
+        task.completed =
+            event.target.checked;
 
         saveData();
 
         renderTasks();
 
         showToast(
-            "✓ Task updated"
+            task.completed
+                ? "🎉 Task completed!"
+                : "Task moved back to active"
         );
-
-        return;
     }
+);
 
 
-    // DELETE
+// ========================================
+// EDIT + DELETE
+// ========================================
 
-    const deleteButton =
-        event.target.closest(
-            "[data-delete]"
-        );
+document.addEventListener(
+    "click",
+    event => {
+
+        const editButton =
+            event.target.closest("[data-edit]");
+
+        if (editButton) {
+
+            const id =
+                Number(editButton.dataset.edit);
+
+            const task =
+                tasks.find(
+                    task => task.id === id
+                );
+
+            if (!task) return;
+
+            const newTitle =
+                prompt(
+                    "Edit task:",
+                    task.title
+                );
+
+            if (
+                newTitle === null ||
+                !newTitle.trim()
+            ) {
+                return;
+            }
+
+            task.title =
+                newTitle.trim();
+
+            saveData();
+
+            renderTasks();
+
+            showToast("✓ Task updated");
+
+            return;
+        }
 
 
-    if (!deleteButton) return;
+        const deleteButton =
+            event.target.closest("[data-delete]");
 
+        if (!deleteButton) return;
 
-    const id =
-        Number(
-            deleteButton.dataset.delete
-        );
+        const id =
+            Number(deleteButton.dataset.delete);
 
+        const task =
+            tasks.find(
+                task => task.id === id
+            );
 
-    const task =
-        tasks.find(
-            task => task.id === id
-        );
+        if (!task) return;
 
+        const confirmed =
+            confirm(
+                `Delete "${task.title}"?`
+            );
 
-    if (!task) return;
+        if (!confirmed) return;
 
+        tasks =
+            tasks.filter(
+                task => task.id !== id
+            );
 
-    const confirmed =
-        confirm(
-            `Delete "${task.title}"?`
-        );
+        saveData();
 
+        renderTasks();
 
-    if (!confirmed) return;
-
-
-    tasks =
-        tasks.filter(
-            task => task.id !== id
-        );
-
-
-    saveData();
-
-    renderTasks();
-
-    showToast(
-        "Task deleted"
-    );
-
-});
+        showToast("Task deleted");
+    }
+);
 
 
 // ========================================
@@ -691,27 +782,18 @@ document
             () => {
 
                 document
-                    .querySelectorAll(
-                        ".filter"
-                    )
+                    .querySelectorAll(".filter")
                     .forEach(btn =>
-                        btn.classList
-                            .remove("active")
+                        btn.classList.remove("active")
                     );
 
-
-                button.classList.add(
-                    "active"
-                );
-
+                button.classList.add("active");
 
                 renderTasks(
-                    button.dataset.filter
+                    button.dataset.filter || "all"
                 );
-
             }
         );
-
     });
 
 
@@ -729,7 +811,6 @@ function updateDashboard() {
             task => task.completed
         ).length;
 
-
     const taskPercentage =
         total === 0
             ? 0
@@ -737,14 +818,11 @@ function updateDashboard() {
                 (completed / total) * 100
             );
 
-
     const todayMinutes =
         getTodayStudyMinutes();
 
-
     const goalMinutes =
-        settings.goal * 60;
-
+        Number(settings.goal) * 60;
 
     const studyPercentage =
         goalMinutes === 0
@@ -752,18 +830,14 @@ function updateDashboard() {
             : Math.min(
                 Math.round(
                     (todayMinutes /
-                        goalMinutes) *
-                    100
+                        goalMinutes) * 100
                 ),
                 100
             );
 
-
-    // PRODUCTIVITY SCORE
-
     const productivity =
         total === 0
-            ? 0
+            ? studyPercentage
             : Math.round(
                 (taskPercentage * 0.6) +
                 (studyPercentage * 0.4)
@@ -774,7 +848,6 @@ function updateDashboard() {
         document.getElementById(
             "productivityScore"
         );
-
 
     if (scoreElement) {
 
@@ -788,7 +861,6 @@ function updateDashboard() {
             "dailyGoal"
         );
 
-
     if (dailyGoal) {
 
         dailyGoal.textContent =
@@ -801,7 +873,6 @@ function updateDashboard() {
             "dailyGoalText"
         );
 
-
     if (dailyGoalText) {
 
         dailyGoalText.textContent =
@@ -813,7 +884,6 @@ function updateDashboard() {
         document.getElementById(
             "productivityText"
         );
-
 
     if (productivityText) {
 
@@ -829,64 +899,46 @@ function updateDashboard() {
             "studyTime"
         );
 
-
     if (studyTime) {
 
         studyTime.textContent =
-            formatMinutes(
-                todayMinutes
-            );
+            formatMinutes(todayMinutes);
     }
 
 
-    updateStudyProgress(
-        todayMinutes
-    );
+    updateStudyProgress(todayMinutes);
 
     updateStreak();
 
     updateAnalytics();
 
     updateStudySummary();
-
-    updateChart();
 }
 
 
 // ========================================
-// STUDY GOAL
+// STUDY PROGRESS
 // ========================================
 
-function updateStudyProgress(
-    minutes
-) {
+function updateStudyProgress(minutes) {
 
     const goalMinutes =
-        settings.goal * 60;
-
+        Number(settings.goal) * 60;
 
     let percentage =
         goalMinutes === 0
             ? 0
             : Math.round(
-                (minutes /
-                    goalMinutes) *
-                100
+                (minutes / goalMinutes) * 100
             );
 
-
     percentage =
-        Math.min(
-            percentage,
-            100
-        );
-
+        Math.min(percentage, 100);
 
     const progress =
         document.getElementById(
             "studyProgress"
         );
-
 
     if (progress) {
 
@@ -900,7 +952,6 @@ function updateStudyProgress(
             "studyProgressText"
         );
 
-
     if (progressText) {
 
         progressText.textContent =
@@ -912,7 +963,6 @@ function updateStudyProgress(
         document.getElementById(
             "studyGoalText"
         );
-
 
     if (goalText) {
 
@@ -926,20 +976,12 @@ function updateStudyProgress(
 // DATE HELPERS
 // ========================================
 
-function sameDay(
-    date1,
-    date2
-) {
+function sameDay(date1, date2) {
 
     return (
-        date1.getFullYear() ===
-        date2.getFullYear() &&
-
-        date1.getMonth() ===
-        date2.getMonth() &&
-
-        date1.getDate() ===
-        date2.getDate()
+        date1.getFullYear() === date2.getFullYear() &&
+        date1.getMonth() === date2.getMonth() &&
+        date1.getDate() === date2.getDate()
     );
 }
 
@@ -949,55 +991,43 @@ function getTodayStudyMinutes() {
     const today =
         new Date();
 
-
     return sessions
         .filter(session =>
             sameDay(
-                new Date(
-                    session.date
-                ),
+                new Date(session.date),
                 today
             )
         )
         .reduce(
             (total, session) =>
-                total +
-                Number(session.minutes),
+                total + Number(session.minutes || 0),
             0
         );
 }
 
 
 // ========================================
-// FORMAT TIME
+// FORMAT MINUTES
 // ========================================
 
-function formatMinutes(
-    minutes
-) {
+function formatMinutes(minutes) {
 
     minutes =
         Math.max(
             0,
-            Math.round(minutes)
+            Math.round(Number(minutes) || 0)
         );
-
 
     if (minutes < 60) {
 
         return `${minutes}m`;
     }
 
-
     const hours =
-        Math.floor(
-            minutes / 60
-        );
-
+        Math.floor(minutes / 60);
 
     const remaining =
         minutes % 60;
-
 
     return remaining === 0
         ? `${hours}h`
@@ -1021,27 +1051,19 @@ function updateStreak() {
             )
         );
 
-
     let streak = 0;
 
     const today =
         new Date();
 
-
-    for (
-        let i = 0;
-        i < 365;
-        i++
-    ) {
+    for (let i = 0; i < 365; i++) {
 
         const checkDate =
             new Date();
 
-
         checkDate.setDate(
             today.getDate() - i
         );
-
 
         if (
             studyDays.has(
@@ -1057,29 +1079,19 @@ function updateStreak() {
         }
     }
 
-
     const streakElement =
-        document.getElementById(
-            "streak"
-        );
-
+        document.getElementById("streak");
 
     if (streakElement) {
 
         streakElement.textContent =
             `${streak} day${
-                streak !== 1
-                    ? "s"
-                    : ""
+                streak !== 1 ? "s" : ""
             }`;
     }
 
-
     const streakText =
-        document.getElementById(
-            "streakText"
-        );
-
+        document.getElementById("streakText");
 
     if (streakText) {
 
@@ -1092,53 +1104,71 @@ function updateStreak() {
 
 
 // ========================================
-// STUDY TIMER
+// TIMER
 // ========================================
 
-let timerSeconds = 30 * 60;
 let selectedMinutes = 30;
+
+let timerSeconds =
+    selectedMinutes * 60;
+
 let timerInterval = null;
+
 let timerRunning = false;
 
 
-// ----------------------------------------
+// ========================================
 // TIMER OPTIONS
-// ----------------------------------------
+// ========================================
 
 document
     .querySelectorAll(".timer-option")
     .forEach(button => {
 
-        button.addEventListener("click", () => {
+        button.addEventListener(
+            "click",
+            () => {
 
-            if (timerRunning) {
-                showToast("Pause the timer before changing duration.");
-                return;
+                if (timerRunning) {
+
+                    showToast(
+                        "Pause the timer before changing duration."
+                    );
+
+                    return;
+                }
+
+                document
+                    .querySelectorAll(
+                        ".timer-option"
+                    )
+                    .forEach(btn =>
+                        btn.classList.remove(
+                            "active"
+                        )
+                    );
+
+                button.classList.add("active");
+
+                selectedMinutes =
+                    Number(
+                        button.dataset.minutes
+                    ) || 30;
+
+                timerSeconds =
+                    selectedMinutes * 60;
+
+                updateTimerDisplay();
+
+                updateTimerStatus("Ready");
             }
-
-            document
-                .querySelectorAll(".timer-option")
-                .forEach(btn =>
-                    btn.classList.remove("active")
-                );
-
-            button.classList.add("active");
-
-            selectedMinutes =
-                Number(button.dataset.minutes);
-
-            timerSeconds =
-                selectedMinutes * 60;
-
-            updateTimerDisplay();
-        });
-
+        );
     });
 
 
-// ----------------------------------------
-// DISPLAY
-// ----------------------------------------
+// ========================================
+// TIMER DISPLAY
+// ========================================
 
 function updateTimerDisplay() {
 
@@ -1148,7 +1178,9 @@ function updateTimerDisplay() {
     if (!timer) return;
 
     const hours =
-        Math.floor(timerSeconds / 3600);
+        Math.floor(
+            timerSeconds / 3600
+        );
 
     const minutes =
         Math.floor(
@@ -1165,34 +1197,73 @@ function updateTimerDisplay() {
 }
 
 
-// ----------------------------------------
-// START / PAUSE
-// ----------------------------------------
+// ========================================
+// TIMER STATUS
+// ========================================
 
-document
-    .getElementById("startTimer")
-    .addEventListener("click", () => {
+function updateTimerStatus(status) {
+
+    const statusElement =
+        document.querySelector(
+            ".timer-status"
+        );
+
+    if (!statusElement) return;
+
+    const dot =
+        statusElement.querySelector(
+            ".status-dot"
+        );
+
+    statusElement.lastChild.textContent =
+        ` ${status}`;
+
+    if (dot) {
+
+        dot.style.animation =
+            status === "Running"
+                ? "timerDotPulse 1.2s infinite"
+                : "none";
+    }
+}
+
+
+// ========================================
+// START / PAUSE / RESUME
+// ========================================
+
+const startTimerButton =
+    document.getElementById(
+        "startTimer"
+    );
+
+
+startTimerButton?.addEventListener(
+    "click",
+    () => {
 
         const timerCard =
-            document.querySelector(".timer-card");
+            document.querySelector(
+                ".timer-card"
+            );
 
-        const startButton =
-            document.getElementById("startTimer");
-
-
-        // ==============================
         // PAUSE
-        // ==============================
-
         if (timerRunning) {
 
             clearInterval(timerInterval);
 
+            timerInterval = null;
+
             timerRunning = false;
 
-            timerCard?.classList.remove("timer-running");
+            timerCard?.classList.remove(
+                "timer-running"
+            );
 
-            startButton.textContent = "▶ Resume";
+            startTimerButton.textContent =
+                "▶ Resume";
+
+            updateTimerStatus("Paused");
 
             showToast("Timer paused");
 
@@ -1200,121 +1271,161 @@ document
         }
 
 
-        // ==============================
         // START / RESUME
-        // ==============================
+
+        if (timerSeconds <= 0) {
+
+            timerSeconds =
+                selectedMinutes * 60;
+
+            updateTimerDisplay();
+        }
 
         timerRunning = true;
 
-        timerCard?.classList.add("timer-running");
+        timerCard?.classList.add(
+            "timer-running"
+        );
 
-        startButton.textContent = "⏸ Pause";
+        startTimerButton.textContent =
+            "⏸ Pause";
 
-
-        timerInterval = setInterval(() => {
-
-            timerSeconds--;
-
-            updateTimerDisplay();
+        updateTimerStatus("Running");
 
 
-            // ==============================
-            // TIMER COMPLETE
-            // ==============================
+        timerInterval =
+            setInterval(
+                () => {
 
-            if (timerSeconds <= 0) {
+                    timerSeconds--;
 
-                clearInterval(timerInterval);
-
-                timerRunning = false;
-
-                timerCard?.classList.remove("timer-running");
+                    updateTimerDisplay();
 
 
-                // Save completed session
-                saveStudySession(selectedMinutes);
+                    if (
+                        timerSeconds <= 0
+                    ) {
+
+                        clearInterval(
+                            timerInterval
+                        );
+
+                        timerInterval = null;
+
+                        timerRunning = false;
+
+                        timerCard?.classList.remove(
+                            "timer-running"
+                        );
 
 
-                showToast(
-                    `🎉 ${formatMinutes(selectedMinutes)} study session completed!`
-                );
+                        saveStudySession(
+                            selectedMinutes
+                        );
 
 
-                // Reset timer
-                timerSeconds =
-                    selectedMinutes * 60;
+                        showToast(
+                            `🎉 ${formatMinutes(
+                                selectedMinutes
+                            )} study session completed!`
+                        );
 
 
-                startButton.textContent =
-                    "▶ Start";
+                        timerSeconds =
+                            selectedMinutes * 60;
 
 
-                updateTimerDisplay();
+                        startTimerButton.textContent =
+                            "▶ Start";
 
-            }
+                        updateTimerDisplay();
 
-        }, 1000);
+                        updateTimerStatus(
+                            "Completed"
+                        );
+                    }
 
-    });
+                },
+                1000
+            );
+    }
+);
 
 
-// ----------------------------------------
-// RESET
-// ----------------------------------------
+// ========================================
+// RESET TIMER
+// ========================================
 
 document
     .getElementById("resetTimer")
-    .addEventListener("click", () => {
+    ?.addEventListener(
+        "click",
+        () => {
 
-        clearInterval(timerInterval);
+            clearInterval(
+                timerInterval
+            );
 
-        timerRunning = false;
+            timerInterval = null;
 
-        document
-            .querySelector(".timer-card")
-            ?.classList.remove("timer-running");
+            timerRunning = false;
 
-        timerSeconds =
-            selectedMinutes * 60;
+            document
+                .querySelector(".timer-card")
+                ?.classList.remove(
+                    "timer-running"
+                );
 
-        document
-            .getElementById("startTimer")
-            .textContent = "▶ Start";
+            timerSeconds =
+                selectedMinutes * 60;
 
-        updateTimerDisplay();
+            const button =
+                document.getElementById(
+                    "startTimer"
+                );
 
-        showToast("Timer reset");
+            if (button) {
 
-    });
+                button.textContent =
+                    "▶ Start";
+            }
+
+            updateTimerDisplay();
+
+            updateTimerStatus("Ready");
+
+            showToast("Timer reset");
+        }
+    );
+
+
 // ========================================
 // SAVE STUDY SESSION
 // ========================================
 
-function saveStudySession(
-    minutes
-) {
+function saveStudySession(minutes) {
 
-    const subject =
+    const subjectSelect =
         document.getElementById(
             "subjectSelect"
-        ).value;
+        );
 
+    const subject =
+        subjectSelect?.value ||
+        "General Study";
 
     sessions.push({
 
         id: Date.now(),
 
         date:
-            new Date()
-                .toISOString(),
+            new Date().toISOString(),
 
         minutes:
-
             Number(minutes),
 
         subject
     });
-
 
     saveData();
 
@@ -1334,19 +1445,16 @@ function updateStudySummary() {
         sessions.filter(
             session =>
                 sameDay(
-                    new Date(
-                        session.date
-                    ),
+                    new Date(session.date),
                     new Date()
                 )
         );
-
 
     const todayMinutes =
         todaySessions.reduce(
             (sum, session) =>
                 sum +
-                Number(session.minutes),
+                Number(session.minutes || 0),
             0
         );
 
@@ -1356,13 +1464,10 @@ function updateStudySummary() {
             "studySummary"
         );
 
-
     if (summary) {
 
         summary.textContent =
-            formatMinutes(
-                todayMinutes
-            );
+            formatMinutes(todayMinutes);
     }
 
 
@@ -1370,7 +1475,6 @@ function updateStudySummary() {
         document.getElementById(
             "sessionCount"
         );
-
 
     if (count) {
 
@@ -1394,18 +1498,14 @@ function renderSessions() {
             "recentSessions"
         );
 
-
     if (!container) return;
-
 
     const todaySessions =
         sessions
             .filter(
                 session =>
                     sameDay(
-                        new Date(
-                            session.date
-                        ),
+                        new Date(session.date),
                         new Date()
                     )
             )
@@ -1444,7 +1544,9 @@ function renderSessions() {
                         </strong>
 
                         <span>
-                            ${session.minutes} min
+                            ${Number(
+                                session.minutes
+                            )} min
                         </span>
 
                     </div>
@@ -1465,19 +1567,12 @@ function updateAnalytics() {
             task => task.completed
         ).length;
 
-
     const totalStudy =
         sessions.reduce(
             (sum, session) =>
                 sum +
-                Number(session.minutes),
+                Number(session.minutes || 0),
             0
-        );
-
-
-    const streak =
-        document.getElementById(
-            "streak"
         );
 
 
@@ -1486,18 +1581,15 @@ function updateAnalytics() {
             "analyticsTasks"
         );
 
-
     const analyticsStudy =
         document.getElementById(
             "analyticsStudy"
         );
 
-
     const analyticsStreak =
         document.getElementById(
             "analyticsStreak"
         );
-
 
     if (analyticsTasks) {
 
@@ -1505,76 +1597,90 @@ function updateAnalytics() {
             completed;
     }
 
-
     if (analyticsStudy) {
 
         analyticsStudy.textContent =
-            formatMinutes(
-                totalStudy
-            );
+            formatMinutes(totalStudy);
     }
 
+    if (analyticsStreak) {
 
-    if (
-        analyticsStreak &&
-        streak
-    ) {
+        const studyDays =
+            new Set(
+                sessions.map(
+                    session =>
+                        new Date(
+                            session.date
+                        ).toDateString()
+                )
+            );
+
+        let streak = 0;
+
+        const today =
+            new Date();
+
+        for (let i = 0; i < 365; i++) {
+
+            const date =
+                new Date();
+
+            date.setDate(
+                today.getDate() - i
+            );
+
+            if (
+                studyDays.has(
+                    date.toDateString()
+                )
+            ) {
+
+                streak++;
+
+            } else {
+
+                break;
+            }
+        }
 
         analyticsStreak.textContent =
-            streak.textContent;
+            `${streak} day${streak !== 1 ? "s" : ""}`;
     }
 }
 
 
 // ========================================
-// CHARTS
+// CHART DATA
 // ========================================
-
-let weeklyChart = null;
-
-let analyticsChart = null;
-
 
 function getWeeklyData() {
 
     const result = [];
 
-
-    for (
-        let i = 6;
-        i >= 0;
-        i--
-    ) {
+    for (let i = 6; i >= 0; i--) {
 
         const date =
             new Date();
 
-
         date.setDate(
             date.getDate() - i
         );
-
 
         const minutes =
             sessions
                 .filter(
                     session =>
                         sameDay(
-                            new Date(
-                                session.date
-                            ),
+                            new Date(session.date),
                             date
                         )
                 )
                 .reduce(
                     (sum, session) =>
                         sum +
-                        Number(
-                            session.minutes
-                        ),
+                        Number(session.minutes || 0),
                     0
                 );
-
 
         result.push({
 
@@ -1582,8 +1688,7 @@ function getWeeklyData() {
                 date.toLocaleDateString(
                     "en-US",
                     {
-                        weekday:
-                            "short"
+                        weekday: "short"
                     }
                 ),
 
@@ -1596,14 +1701,18 @@ function getWeeklyData() {
         });
     }
 
-
     return result;
 }
 
 
 // ========================================
-// UPDATE CHART
+// CHARTS
 // ========================================
+
+let weeklyChart = null;
+
+let analyticsChart = null;
+
 
 function updateChart() {
 
@@ -1620,30 +1729,19 @@ function updateChart() {
             "weeklyChart"
         );
 
-
     const analyticsCanvas =
         document.getElementById(
             "analyticsChart"
         );
 
 
-    if (
-        !weeklyCanvas ||
-        !analyticsCanvas
-    ) {
-        return;
-    }
-
-
     const data =
         getWeeklyData();
-
 
     const labels =
         data.map(
             item => item.label
         );
-
 
     const values =
         data.map(
@@ -1671,6 +1769,7 @@ function updateChart() {
         scales: {
 
             y: {
+
                 beginAtZero: true,
 
                 ticks: {
@@ -1679,6 +1778,7 @@ function updateChart() {
             },
 
             x: {
+
                 grid: {
                     display: false
                 }
@@ -1687,77 +1787,83 @@ function updateChart() {
     };
 
 
-    if (weeklyChart) {
+    if (
+        weeklyCanvas
+    ) {
 
-        weeklyChart.destroy();
+        if (weeklyChart) {
+
+            weeklyChart.destroy();
+        }
+
+        weeklyChart =
+            new Chart(
+                weeklyCanvas,
+                {
+
+                    type: "bar",
+
+                    data: {
+
+                        labels,
+
+                        datasets: [{
+
+                            data: values,
+
+                            borderRadius: 8,
+
+                            borderSkipped:
+                                false
+                        }]
+                    },
+
+                    options:
+                        commonOptions
+                }
+            );
     }
 
 
-    weeklyChart =
-        new Chart(
-            weeklyCanvas,
-            {
+    if (
+        analyticsCanvas
+    ) {
 
-                type: "bar",
+        if (analyticsChart) {
 
-                data: {
+            analyticsChart.destroy();
+        }
 
-                    labels,
+        analyticsChart =
+            new Chart(
+                analyticsCanvas,
+                {
 
-                    datasets: [{
+                    type: "line",
 
-                        data: values,
+                    data: {
 
-                        borderRadius: 8,
+                        labels,
 
-                        borderSkipped:
-                            false
+                        datasets: [{
 
-                    }]
-                },
+                            data: values,
 
-                options:
-                    commonOptions
-            }
-        );
+                            tension: 0.4,
 
+                            fill: true,
 
-    if (analyticsChart) {
+                            pointRadius: 4,
 
-        analyticsChart.destroy();
+                            pointHoverRadius: 7
+                        }]
+                    },
+
+                    options:
+                        commonOptions
+                }
+            );
     }
-
-
-    analyticsChart =
-        new Chart(
-            analyticsCanvas,
-            {
-
-                type: "line",
-
-                data: {
-
-                    labels,
-
-                    datasets: [{
-
-                        data: values,
-
-                        tension: 0.4,
-
-                        fill: true,
-
-                        pointRadius: 4,
-
-                        pointHoverRadius: 7
-
-                    }]
-                },
-
-                options:
-                    commonOptions
-            }
-        );
 }
 
 
@@ -1790,63 +1896,64 @@ if (goalInput) {
 }
 
 
-if (nameInput) {
+nameInput?.addEventListener(
+    "change",
+    () => {
 
-    nameInput.addEventListener(
-        "change",
-        () => {
+        const name =
+            nameInput.value.trim();
 
-            const name =
-                nameInput.value.trim();
+        if (!name) {
 
+            nameInput.value =
+                settings.name;
 
-            if (!name) {
-
-                nameInput.value =
-                    settings.name;
-
-                return;
-            }
-
-
-            settings.name =
-                name;
-
-
-            saveData();
-
-            updateGreeting();
-
-            showToast(
-                "✓ Name updated"
-            );
+            return;
         }
-    );
-}
+
+        settings.name =
+            name;
+
+        saveData();
+
+        updateGreeting();
+
+        showToast("✓ Name updated");
+    }
+);
 
 
-if (goalInput) {
+goalInput?.addEventListener(
+    "change",
+    () => {
 
-    goalInput.addEventListener(
-        "change",
-        () => {
+        let goal =
+            Number(goalInput.value);
 
-            settings.goal =
-                Number(
-                    goalInput.value
-                );
+        if (
+            !Number.isFinite(goal) ||
+            goal <= 0
+        ) {
 
+            goal =
+                4;
 
-            saveData();
-
-            updateDashboard();
-
-            showToast(
-                "✓ Study goal updated"
-            );
+            goalInput.value =
+                goal;
         }
-    );
-}
+
+        settings.goal =
+            goal;
+
+        saveData();
+
+        updateDashboard();
+
+        showToast(
+            "✓ Study goal updated"
+        );
+    }
+);
 
 
 // ========================================
@@ -1857,15 +1964,13 @@ function applyTheme() {
 
     document.body.classList.toggle(
         "dark",
-        settings.dark
+        Boolean(settings.dark)
     );
-
 
     const themeButton =
         document.getElementById(
             "themeBtn"
         );
-
 
     if (themeButton) {
 
@@ -1879,13 +1984,12 @@ function applyTheme() {
 
 document
     .getElementById("themeBtn")
-    .addEventListener(
+    ?.addEventListener(
         "click",
         () => {
 
             settings.dark =
                 !settings.dark;
-
 
             saveData();
 
@@ -1896,6 +2000,8 @@ document
                     ? "🌙 Dark mode enabled"
                     : "☀️ Light mode enabled"
             );
+
+            updateChart();
         }
     );
 
@@ -1906,7 +2012,7 @@ document
 
 document
     .getElementById("resetData")
-    .addEventListener(
+    ?.addEventListener(
         "click",
         () => {
 
@@ -1915,14 +2021,11 @@ document
                     "This will permanently delete all tasks and study history. Continue?"
                 );
 
-
             if (!confirmed) return;
-
 
             tasks = [];
 
             sessions = [];
-
 
             saveData();
 
@@ -1948,10 +2051,8 @@ function escapeHTML(text) {
             "div"
         );
 
-
     div.textContent =
         String(text);
-
 
     return div.innerHTML;
 }
@@ -1969,8 +2070,36 @@ applyTheme();
 
 updateTimerDisplay();
 
+updateTimerStatus("Ready");
+
 renderTasks();
 
 updateDashboard();
 
 renderSessions();
+
+
+// ========================================
+// TIMER STATUS ANIMATION
+// ========================================
+
+const timerStatusStyle =
+    document.createElement("style");
+
+timerStatusStyle.textContent = `
+    @keyframes timerDotPulse {
+        0%, 100% {
+            opacity: 1;
+            transform: scale(1);
+        }
+
+        50% {
+            opacity: .45;
+            transform: scale(.75);
+        }
+    }
+`;
+
+document.head.appendChild(
+    timerStatusStyle
+);
