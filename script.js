@@ -2103,3 +2103,165 @@ timerStatusStyle.textContent = `
 document.head.appendChild(
     timerStatusStyle
 );
+// ========================================
+// MOBILE SIDEBAR CONTROL
+// ========================================
+
+(function () {
+
+    const sidebar =
+        document.querySelector(".sidebar");
+
+    const menuButton =
+        document.getElementById("mobileMenuBtn") ||
+        document.querySelector(".mobile-menu-btn") ||
+        document.querySelector(".menu-btn");
+
+    if (!sidebar || !menuButton) return;
+
+
+    let overlay =
+        document.querySelector(".sidebar-overlay");
+
+
+    // Create overlay
+    if (!overlay) {
+
+        overlay =
+            document.createElement("div");
+
+        overlay.className =
+            "sidebar-overlay";
+
+        document.body.appendChild(overlay);
+    }
+
+
+    // ----------------------------------------
+    // OPEN
+    // ----------------------------------------
+
+    function openMobileSidebar() {
+
+        sidebar.classList.add("mobile-open");
+
+        overlay.classList.add("show");
+
+        document.body.classList.add(
+            "sidebar-open"
+        );
+    }
+
+
+    // ----------------------------------------
+    // CLOSE
+    // ----------------------------------------
+
+    function closeMobileSidebar() {
+
+        sidebar.classList.remove(
+            "mobile-open"
+        );
+
+        overlay.classList.remove("show");
+
+        document.body.classList.remove(
+            "sidebar-open"
+        );
+    }
+
+
+    // ----------------------------------------
+    // MENU BUTTON
+    // ----------------------------------------
+
+    menuButton.addEventListener(
+        "click",
+        function (event) {
+
+            event.preventDefault();
+
+            event.stopPropagation();
+
+            openMobileSidebar();
+
+        }
+    );
+
+
+    // ----------------------------------------
+    // CLOSE BUTTON
+    // ----------------------------------------
+
+    const closeButton =
+        document.getElementById("closeSidebar") ||
+        document.querySelector(".close-sidebar") ||
+        document.querySelector(".sidebar-close");
+
+
+    if (closeButton) {
+
+        closeButton.addEventListener(
+            "click",
+            closeMobileSidebar
+        );
+    }
+
+
+    // ----------------------------------------
+    // OVERLAY
+    // ----------------------------------------
+
+    overlay.addEventListener(
+        "click",
+        closeMobileSidebar
+    );
+
+
+    // ----------------------------------------
+    // NAVIGATION
+    // ----------------------------------------
+
+    sidebar
+        .querySelectorAll(".nav-item")
+        .forEach(item => {
+
+            item.addEventListener(
+                "click",
+                function () {
+
+                    if (
+                        window.innerWidth <= 768
+                    ) {
+
+                        setTimeout(
+                            closeMobileSidebar,
+                            100
+                        );
+
+                    }
+
+                }
+            );
+
+        });
+
+
+    // ----------------------------------------
+    // ESC
+    // ----------------------------------------
+
+    document.addEventListener(
+        "keydown",
+        function (event) {
+
+            if (event.key === "Escape") {
+
+                closeMobileSidebar();
+
+            }
+
+        }
+    );
+
+})();
